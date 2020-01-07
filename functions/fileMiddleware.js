@@ -19,7 +19,16 @@ module.exports = function(req, res, next) {
     busboy.on('field', (key, value) => {
       // You could do additional deserialization logic here, values will just be
       // strings
-      fields[key] = value;
+      if(fields[key]) {
+        const oldValue = fields[key];
+
+        const newValue = Array.isArray(oldValue) ? [...oldValue, value] : [oldValue, value];
+
+        fields[key] = newValue;
+      } else {
+        fields[key] = value;
+      }
+
     });
   
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {

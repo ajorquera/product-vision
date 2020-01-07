@@ -67,7 +67,12 @@ function App() {
               {imgInfo.webEntities.join(', ')}
             </div>
           )}
-
+          {imgInfo.text && (
+            <div>
+              <h4>Texto</h4>
+          <p>{imgInfo.text[0]}</p>
+            </div>
+          )}
           {imgInfo.webEntities && (
             <div>
               <h4>Similar images</h4>
@@ -78,6 +83,7 @@ function App() {
               ))}
             </div>
           )}
+
           <pre>
             <JSONPretty id="json-pretty" data={imgInfo}></JSONPretty>
           </pre>

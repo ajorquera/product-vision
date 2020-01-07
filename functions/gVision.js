@@ -1,4 +1,4 @@
-const gVision = require('@google-cloud/vision').v1p4beta1;
+const gVision = require('@google-cloud/vision');
 const {set} = require('lodash');
 
 const visionClient = new gVision.ImageAnnotatorClient();

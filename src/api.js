@@ -4,7 +4,7 @@ export const identifyImg = (file) => {
     const formData = new FormData()
     formData.append('image', file);
     formData.append('type', 'WEB_DETECTION');
-    //formData.append('type', 'TEXT_DETECTION');
+    formData.append('type', 'TEXT_DETECTION');
 
 
     return request(`${baseUrl}/image`, {
@@ -48,10 +48,10 @@ const processData = (data) => {
     }
 
     if(data.fullTextAnnotation) {
-        processedData.fullText = data.fullTextAnnotation.text;
+        //processedData.fullText = data.fullTextAnnotation.text;
     }
 
-    processedData.data = data;
+    // processedData.data = data;
 
     return processedData;
 }
