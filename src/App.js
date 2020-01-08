@@ -17,6 +17,16 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [imgInfo, setImgInfo] = useState(null);
 
+  const [isDetectText, setIsDetectText] = useState(false);
+  const [isDetectFaces, setIsDetectFaces] = useState(false);
+  const [isDetectWebEntities, setIsDetectWebEntities] = useState(false);
+
+  const set = {
+    isDetectText: setIsDetectText,
+    isDetectFaces: setIsDetectFaces,
+    isDetectWebEntities: setIsDetectWebEntities
+  };
+
   const onChange = (e) => {
     const file = e.target && e.target.files && e.target.files[0];
 
@@ -33,13 +43,27 @@ function App() {
     }
   }
 
+  const handleCheckboxChange = (name) => {
+    return (e) => {
+      const target = e.target;
+      const value = target.checked;
+      set[name](value);
+    }
+  }
+
   const handleError = (error) => {
     console.error(error)
   };
 
   const analyzeImg = (img) => {
     setLoading(true);
-    identifyImg(img)
+    const types = [];
+
+    if(isDetectWebEntities) types.push('WEB_DETECTION');
+    if(isDetectFaces) types.push('FACE_DETECTION');
+    if(isDetectText) types.push('TEXT_DETECTION');
+
+    identifyImg(img, types)
       .then(data => setImgInfo(data))
       .catch(handleError)
       .finally(() => setLoading(false));
@@ -47,9 +71,35 @@ function App() {
 
   return (
     <div>
-      <div>
-        <input type="file" accept="image/*" onChange={onChange} />
-      </div>
+      <form>
+        
+      <label>
+          Detectar texto
+          <input type="checkbox" checked={isDetectText} onChange={handleCheckboxChange('isDetectText')} />
+        </label>
+        <br/>
+
+        <label>
+          Detectar entidades web
+          <input type="checkbox" checked={isDetectWebEntities} onChange={handleCheckboxChange('isDetectWebEntities')} />
+        </label>
+        <br/>
+
+        <label>
+          Detectar caras
+          <input type="checkbox" checked={isDetectFaces} onChange={handleCheckboxChange('isDetectFaces')} />
+        </label>
+        <br/>
+
+
+        <label>
+          Selecciona una imagen
+          <input type="file" accept="image/*" onChange={onChange} />
+        </label>
+        
+
+
+      </form>
       {imgPreview && (
         <div style={styles.imgContainer}>
           <img style={{height: '100%', width: '100%'}} src={imgPreview} alt="product" />
@@ -67,10 +117,16 @@ function App() {
               {imgInfo.webEntities.join(', ')}
             </div>
           )}
+           {imgInfo.expresions && (
+            <div>
+              <h4>Emociones</h4>
+              {imgInfo.expresions.join(', ')}
+            </div>
+          )}
           {imgInfo.text && (
             <div>
               <h4>Texto</h4>
-          <p>{imgInfo.text[0]}</p>
+              <p>{imgInfo.text[0]}</p>
             </div>
           )}
           {imgInfo.webEntities && (

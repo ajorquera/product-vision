@@ -1,11 +1,9 @@
 const baseUrl = process.env.REACT_APP_API_URL;
 
-export const identifyImg = (file) => {
+export const identifyImg = (file, types) => {
     const formData = new FormData()
     formData.append('image', file);
-    formData.append('type', 'WEB_DETECTION');
-    formData.append('type', 'TEXT_DETECTION');
-
+    types.forEach(type => formData.append('type', type));
 
     return request(`${baseUrl}/image`, {
         method: 'POST',
@@ -43,8 +41,24 @@ const processData = (data) => {
         processedData.visuallySimilarImages = visuallySimilarImages.map(item => item.url);
     }
 
-    if(data.textAnnotations) {
+    if(data.textAnnotations && data.textAnnotations.length) {
         processedData.text = data.textAnnotations.map(item => item.description);
+    }
+
+    if(data.faceAnnotations && data.faceAnnotations.length) {
+        const props = ['joyLikelihood', 'sorrowLikelihood', 'angerLikelihood', 'surpriseLikelihood']
+
+        const expresions = [];
+
+        const face = data.faceAnnotations[0];
+
+        Object.entries(face).forEach(([key, value]) => {
+            if(props.indexOf(key) !== -1 && value === 'VERY_LIKELY') {
+                expresions.push(key.replace('Likelihood', '').toUpperCase())
+            }
+        });
+
+        processedData.expresions = expresions;
     }
 
     if(data.fullTextAnnotation) {
